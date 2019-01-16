@@ -150,9 +150,20 @@ a, a:visited {
     line-height: 2rem;
     text-align: center;
 }
-.control-panel__btn--active {
-    background-color: #ff0;
-    border-color: #ff0;
+.control-panel__button {
+    color: #0f0;
+    background-color: #000;
+    border-color: #999;
+    border-radius: 5px;
+    padding: 6px 12px;
+}
+.control-panel__button:focus {
+    outline: none;
+}
+.control-panel__button--active {
+    background-color: #0f0;
+    border-color: #0f0;
+    color: #000;
 }
 
 footer {

@@ -92,8 +92,6 @@ class Model {
      * @return {int} DEAD or LIVE
      */
     static whatComesNext(stage, idx, width) {
-        //return Math.round(Math.random());   //とりあえず適当に返す。
-
         //ここがライフゲームの肝ですです。ルールを適用して、対象セルは次世代には生きている(or生まれる)のか、それとも死んでいるのかを判別します。
         //ルールは以下の通り。すべて回りの隣接8セルを見て判断します。
         let neighborhoods = Model.getNeighborhoods(stage, idx, width);
@@ -101,7 +99,7 @@ class Model {
         let livingNeighborhoods = neighborhoods.reduce((acc, cur) => acc + cur, 0);
         
         if (stage[idx] === DEAD) {
-            //ルール1、隣接セルに生きているセルがちょうど3個あったら誕生。(これだけ死亡セルに対するルール)
+            //ルール1、隣接セルに生きているセルがちょうど3個あったら誕生。なければ死亡。(これだけ死亡セルに対するルール)
             return Number((livingNeighborhoods === 3));
         } else {
             if (livingNeighborhoods === 2 | livingNeighborhoods === 3) {
@@ -114,9 +112,6 @@ class Model {
                 //ルール4、生きているセルに隣接する生きたセルが4個以上なら、死亡。
                 return DEAD;
             }
-            
-            
-            
         }
         
     }
@@ -287,7 +282,7 @@ $(() => {
             }
         }, 500);
 
-        $(e.target).addClass("control-panel__btn--active");
+        $(e.target).addClass("control-panel__button--active");
     });
     //いつでもStopボタンで止められる。
     $("button#stop").click((e) => {
@@ -297,7 +292,7 @@ $(() => {
         state.isStarted = false;
         clearInterval(state.handleOfInterval);
 
-        $("button#launch").removeClass("control-panel__btn--active");
+        $("button#launch").removeClass("control-panel__button--active");
         $("#now-generation").text(state.generationCount + "世代目(終了)");
     });
 });
