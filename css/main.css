@@ -97,6 +97,9 @@ textarea {
    Author's custom styles
    ========================================================================== */
 
+body {
+    background-color: #000;
+}
 
 h1 {
     text-align: center;
@@ -109,16 +112,13 @@ a, a:visited {
 .viewport {
     margin: 0;
     padding: 0;
-    width: 100vw;
-    height: 100vh;
-    overflow: hidden;
-    background-color: #000;
+    width: 100%;
     color: #0f0;
 }
 .container {
     width: 1000px;
-    height: 80vh;
-    margin: 8vh auto 0 auto;
+    margin: 0 auto;
+    padding: 4vh 0;
 }
 .stage {
     border-spacing: 0px;
