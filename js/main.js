@@ -8,13 +8,15 @@
 */
 
 /* global $ */
-
+const LIVE = 1;
+const DEAD = 0;
 let constant = {
     width: 60,
     height: 60,
     clippedWidth: 40,
     clippedHeight: 40,
     preset: {
+        "none": [[0]],
         "puffer_train": [
             [0, 0, 0, 1, 0,],
             [0, 0, 0, 0, 1,],
@@ -38,30 +40,37 @@ let constant = {
     },
 };
 let state = {
+    //各種ステージ。このデータを元にゲームが進行する。
+    //処理の簡便さを重視して1次元配列で実装し、各々の処理の中で2次元配列系が必要になったらその都度変換する形にしてみたが、果たして本当に簡便になっているのかは疑問。
     nowStage: [],
     nextStage: [],
     previousStage: [],
     origin: [],
     isStarted: true,
+    generationCount: 1,
     handleOfInterval: 0,
 };
 
 /* モデル */
 class Model {
     /**
-     * 
+     * 空のステージを作る。
      * @param {int} width 
      * @param {int} height 
      */
     static generateEmptyStage(width, height) {
-        return new Array(width * height);
+        let result = new Array(width * height);
+        for (let i = 0; i < result.length; i++) {
+            result[i] = DEAD;   //初期状態はDEADから。
+        }
+        return result;
     }
     /**
      * 次世代を生成する。
-     * @param {*} stage 
-     * @param {*} width 
-     * @param {*} height 
-     * @return {Array}
+     * @param {Array} stage 
+     * @param {int} width 
+     * @param {int} height 
+     * @return {Array}  次世代のステージ
      */
     static buildNextGeneration(stage, width, height) {
         let result = [];
@@ -76,14 +85,60 @@ class Model {
     }
     /**
      * 対象セルの次の状態はどうなるのか返す。
-     * @param {*} stage 
+     * @param {Array} stage 
      * @param {*} idx 
      * @param {*} width 
      * @param {*} height 
-     * @return {int} 0=死亡 1=誕生or維持
+     * @return {int} DEAD or LIVE
      */
-    static whatComesNext(stage, idx, width, height) {
-        return Math.round(Math.random());   //とりあえず適当に返す。
+    static whatComesNext(stage, idx, width) {
+        //return Math.round(Math.random());   //とりあえず適当に返す。
+
+        //ここがライフゲームの肝ですです。ルールを適用して、対象セルは次世代には生きている(or生まれる)のか、それとも死んでいるのかを判別します。
+        //ルールは以下の通り。すべて回りの隣接8セルを見て判断します。
+        let neighborhoods = Model.getNeighborhoods(stage, idx, width);
+        
+        let livingNeighborhoods = neighborhoods.reduce((acc, cur) => acc + cur, 0);
+        
+        if (stage[idx] === DEAD) {
+            //ルール1、隣接セルに生きているセルがちょうど3個あったら誕生。(これだけ死亡セルに対するルール)
+            return Number((livingNeighborhoods === 3));
+        } else {
+            if (livingNeighborhoods === 2 | livingNeighborhoods === 3) {
+                //ルール2、生きているセルに隣接する生きたセルが2個か3個なら、生存。
+                return LIVE;
+            } else if (livingNeighborhoods <= 1) {
+                //ルール3、生きているセルに隣接する生きたセルが1個以下なら、死亡。
+                return DEAD;
+            } else if (livingNeighborhoods >= 4) {
+                //ルール4、生きているセルに隣接する生きたセルが4個以上なら、死亡。
+                return DEAD;
+            }
+            
+            
+            
+        }
+        
+    }
+    /**
+     * 対象セルに隣接するセルを取得する。
+     * @param {Array} stage
+     * @param {int} idx
+     * @param {int} width ステージの幅
+     */
+    static getNeighborhoods(stage, idx, width) {
+        let neighborhoods = [];
+        //隣接要素の存在確認をしながら、一つづつピックアップしていく。
+        if (stage[idx - width - 1] !== undefined) neighborhoods.push(stage[idx - width - 1]);
+        if (stage[idx - width] !== undefined) neighborhoods.push(stage[idx - width]);
+        if (stage[idx - width + 1] !== undefined) neighborhoods.push(stage[idx - width + 1]);
+        if (stage[idx - 1] !== undefined) neighborhoods.push(stage[idx - 1]);
+        if (stage[idx + 1] !== undefined) neighborhoods.push(stage[idx + 1]);
+        if (stage[idx + width - 1] !== undefined) neighborhoods.push(stage[idx + width - 1]);
+        if (stage[idx + width] !== undefined) neighborhoods.push(stage[idx + width]);
+        if (stage[idx + width + 1] !== undefined) neighborhoods.push(stage[idx + width + 1]);
+
+        return neighborhoods;
     }
     /**
      * 全滅したか。
@@ -101,7 +156,13 @@ class Model {
     static isStagnating(stage, previousStage) {
         //この判別はめんどくさい・・・やめよっかな
     }
-    
+    /**
+     * 2次元座標系を元に、ステージ上のインデックスを求める。
+     * ステージ自体は1次元配列で実装されているため、このような変換処理が必要になる。
+     * @param {*} x 
+     * @param {*} y 
+     * @param {*} width 
+     */
     static getOneDimIdxFrom(x, y, width) {
         return y * width + x;
     }
@@ -154,7 +215,6 @@ class Drawer {
                 } else {
                     tmpElement += "<td class='stage__cell stage__cell--dead' data-idx='" + nowIdx + "'></td>";
                 }
-                
             }
             tmpElement += "</tr>";
             body += tmpElement;
@@ -180,43 +240,54 @@ function initialize() {
 $(() => {
     //一番最初に初期化する。
     initialize();
-    //まずはじめに、初期状態を決める。天地創造！！
 
+    //まずはじめに、初期状態を決める。天地創造！！
     //セルをクリックすると、色がついたりつかなかったりする。それに合わせてstateの該当箇所も置き換える。
     $("#stage")
         .on("click", ".stage__cell--live", (e) => {
             $(e.target).removeClass("stage__cell--live").addClass("stage__cell--dead");
-            state.nowStage[$(this).data("idx")] = 0;
+            state.nowStage[$(e.target).data("idx")] = DEAD;
         })
         .on("click", ".stage__cell--dead", (e) => {
             $(e.target).removeClass("stage__cell--dead").addClass("stage__cell--live");
-            state.nowStage[$(this).data("idx")] = 1;
+            state.nowStage[$(e.target).data("idx")] = LIVE;
         });
-    //プリセットのローディング。
+    
+    //また、初期状態を自分で入れる他、プリセットをロードして、よく知られた盤面を再現することもできる。選定基準はにしふなの独断と偏見。
     $("#apply").on("click", (e) => {
         let selectedPreset = $("#preset").val();
-        if (selectedPreset == "none") {
-            state.nowStage = Model.generateEmptyStage(constant.width, constant.height);
-        } else if (Object.keys(constant.preset).indexOf(selectedPreset) !== -1) {
-            
+        if (Object.keys(constant.preset).indexOf(selectedPreset) !== -1) {
+            state.nowStage = Model.applyPreset(constant.width, constant.height, constant.preset[selectedPreset]);
         } else {
             return;
         }
         Drawer.buildAndDrawStage(state.nowStage, constant.width, constant.height, constant.clippedWidth, constant.clippedHeight);
     });
-    //手で初期状態を入れてもらう。入れ終わったら「Launch」ボタンを押して始まる。
+
+    //初期状態を入れ終わったら、「Launch」ボタンを押して始める。
     $("button#launch").click((e) => {
         if (state.isStarted) {
             return false;
         }
+
         state.isStarted = true;
+        state.generationCount = 1;
+        $("#now-generation").text(state.generationCount + "世代目");
+
         state.handleOfInterval = setInterval(() => {
             state.previousStage = state.nowStage.slice(0);  //コピー
             state.nowStage = Model.buildNextGeneration(state.nowStage, constant.width, constant.height);
             Drawer.buildAndDrawStage(state.nowStage, constant.width, constant.height, constant.clippedWidth, constant.clippedHeight);
+            state.generationCount++;
+            $("#now-generation").text(state.generationCount + "世代目");
+
+            //終了判定。今の世代が全滅していたら終わらせる。
+            if (Model.isDestroyed(state.nowStage)) {
+                $("button#stop").click();
+            }
         }, 500);
 
-        
+        $(e.target).addClass("control-panel__btn--active");
     });
     //いつでもStopボタンで止められる。
     $("button#stop").click((e) => {
@@ -225,5 +296,8 @@ $(() => {
         }
         state.isStarted = false;
         clearInterval(state.handleOfInterval);
+
+        $("button#launch").removeClass("control-panel__btn--active");
+        $("#now-generation").text(state.generationCount + "世代目(終了)");
     });
 });

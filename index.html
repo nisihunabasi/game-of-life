@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
-    <title></title>
+    <title>Game of Life</title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
@@ -39,111 +39,18 @@
                 <br>
                 <button id="launch" class="control-panel__button" type="button">Launch</button>
                 <button id="stop" class="control-panel__button" type="button">Stop</button>
+                <br>
+                <p id="now-generation" class="control-panel__now-generation">-----</p>
             </form>
             <table class="stage" id="stage">
-                <tr>
-                    <td class="stage__cell"></td>
-                    <td class="stage__cell"></td>
-                    <td class="stage__cell"></td>
-                    <td class="stage__cell"></td>
-                    <td class="stage__cell"></td>
-                    <td class="stage__cell"></td>
-                    <td class="stage__cell"></td>
-                    <td class="stage__cell"></td>
-                    <td class="stage__cell"></td>
-                    <td class="stage__cell"></td>
-                    <td class="stage__cell"></td>
-                    <td class="stage__cell"></td>
-                    <td class="stage__cell"></td>
-                    <td class="stage__cell"></td>
-                    <td class="stage__cell"></td>
-                    <td class="stage__cell"></td>
-                    <td class="stage__cell"></td>
-                    <td class="stage__cell"></td>
-                    <td class="stage__cell"></td>
-                    <td class="stage__cell"></td>
-                    <td class="stage__cell"></td>
-                    <td class="stage__cell"></td>
-                    <td class="stage__cell"></td>
-                    <td class="stage__cell"></td>
-                    <td class="stage__cell"></td>
-                    <td class="stage__cell"></td>
-                    <td class="stage__cell"></td>
-                    <td class="stage__cell"></td>
-                    <td class="stage__cell"></td>
-                    <td class="stage__cell"></td>
-                    <td class="stage__cell"></td>
-                    <td class="stage__cell"></td>
-                    <td class="stage__cell"></td>
-                    <td class="stage__cell"></td>
-                    <td class="stage__cell"></td>
-                    <td class="stage__cell"></td>
-                    <td class="stage__cell"></td>
-                    <td class="stage__cell"></td>
-                    <td class="stage__cell"></td>
-                    <td class="stage__cell"></td>
-                    <td class="stage__cell"></td>
-                    <td class="stage__cell"></td>
-                    <td class="stage__cell"></td>
-                    <td class="stage__cell"></td>
-                    <td class="stage__cell"></td>
-                    <td class="stage__cell"></td>
-                    <td class="stage__cell"></td>
-                    <td class="stage__cell"></td>
-                    <td class="stage__cell"></td>
-                    <td class="stage__cell"></td>
-                    <td class="stage__cell"></td>
-                    <td class="stage__cell"></td>
-                    <td class="stage__cell"></td>
-                    <td class="stage__cell"></td>
-                    <td class="stage__cell"></td>
-                    <td class="stage__cell"></td>
-                    <td class="stage__cell"></td>
-                    <td class="stage__cell"></td>
-                    <td class="stage__cell"></td>
-                    <td class="stage__cell"></td>
-                    <td class="stage__cell"></td>
-                    <td class="stage__cell"></td>
-                    <td class="stage__cell"></td>
-                    <td class="stage__cell"></td>
-                    <td class="stage__cell"></td>
-                    <td class="stage__cell"></td>
-                    <td class="stage__cell"></td>
-                    <td class="stage__cell"></td>
-                    <td class="stage__cell"></td>
-                    <td class="stage__cell"></td>
-                    <td class="stage__cell"></td>
-                    <td class="stage__cell"></td>
-                    <td class="stage__cell"></td>
-                    <td class="stage__cell"></td>
-                    <td class="stage__cell"></td>
-                    <td class="stage__cell"></td>
-                    <td class="stage__cell"></td>
-                    <td class="stage__cell"></td>
-                    <td class="stage__cell"></td>
-                    <td class="stage__cell"></td>
-                    <td class="stage__cell"></td>
-                    <td class="stage__cell"></td>
-                    <td class="stage__cell"></td>
-                    <td class="stage__cell"></td>
-                    <td class="stage__cell"></td>
-                    <td class="stage__cell"></td>
-                    <td class="stage__cell"></td>
-                    <td class="stage__cell"></td>
-                    <td class="stage__cell"></td>
-                    <td class="stage__cell"></td>
-                    <td class="stage__cell"></td>
-                    <td class="stage__cell"></td>
-                    <td class="stage__cell"></td>
-                    <td class="stage__cell"></td>
-                    <td class="stage__cell"></td>
-                    <td class="stage__cell"></td>
-                    <td class="stage__cell"></td>
-                    <td class="stage__cell"></td>
-                    <td class="stage__cell"></td>
-                    <td class="stage__cell"></td>
-                </tr>
             </table>
+
+            <hr>
+            <footer>
+                <p>
+                    Tw: <a href="https://twitter.com/nisihunabasi">@nisihunabasi</a>
+                </p>
+            </footer>
         </div>
     </div>
     <script src="js/vendor/modernizr-3.6.0.min.js"></script>
@@ -153,7 +60,7 @@
     </script>
     <script src="js/plugins.js"></script>
     <script src="js/main.js"></script>
-
+    
     <!-- Google Analytics: change UA-XXXXX-Y to be your site's ID. -->
     <script>
         window.ga = function() {

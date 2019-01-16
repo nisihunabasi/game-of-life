@@ -102,6 +102,10 @@ h1 {
     text-align: center;
 }
 
+a, a:visited {
+    color: #0f0;
+}
+
 .viewport {
     margin: 0;
     padding: 0;
@@ -114,7 +118,7 @@ h1 {
 .container {
     width: 1000px;
     height: 80vh;
-    margin: 10vh auto 0 auto;
+    margin: 8vh auto 0 auto;
 }
 .stage {
     border-spacing: 0px;
@@ -146,7 +150,15 @@ h1 {
     line-height: 2rem;
     text-align: center;
 }
+.control-panel__btn--active {
+    background-color: #ff0;
+    border-color: #ff0;
+}
 
+footer {
+    width: 600px; 
+    margin: 1rem auto;
+}
 
 
 
