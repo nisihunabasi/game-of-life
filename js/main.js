@@ -114,9 +114,9 @@ class Model {
     /**
      * 対象セルの次の状態はどうなるのか返す。
      * @param {Array} stage 
-     * @param {*} idx 
-     * @param {*} width 
-     * @param {*} height 
+     * @param {int} idx 
+     * @param {int} width 
+     * @param {int} height 
      * @return {int} DEAD or LIVE
      */
     static whatComesNext(stage, idx, width) {
@@ -182,9 +182,9 @@ class Model {
     /**
      * 2次元座標系を元に、ステージ上のインデックスを求める。
      * ステージ自体は1次元配列で実装されているため、このような変換処理が必要になる。
-     * @param {*} x 
-     * @param {*} y 
-     * @param {*} width 
+     * @param {int} x 
+     * @param {int} y 
+     * @param {int} width 
      */
     static getOneDimIdxFrom(x, y, width) {
         return y * width + x;
@@ -272,6 +272,10 @@ function initialize() {
 $(() => {
     //一番最初に初期化する。
     initialize();
+
+    /////////////////////
+    // イベントハンドラ
+    /////////////////////
 
     //まずはじめに、初期状態を決める。天地創造！！
     //セルをクリックすると、色がついたりつかなかったりする。それに合わせてstateの該当箇所も置き換える。

@@ -123,6 +123,8 @@ a, a:visited {
 .stage {
     border-spacing: 0px;
     width: 600px;
+    min-width: 600px;
+    min-height: 561px;
     margin: 0 auto;
     border-bottom: 1px solid #999;
     border-right: 1px solid #999;
