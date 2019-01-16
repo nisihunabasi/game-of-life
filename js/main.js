@@ -15,8 +15,36 @@ let constant = {
     height: 60,
     clippedWidth: 40,
     clippedHeight: 40,
+    tickMSec: 250,
     preset: {
         "none": [[0]],
+        "pentadecathlon": [
+            [0, 1, 0, 0, 0, 0, 1, 0],
+            [1, 1, 0, 0, 0, 0, 1, 1],
+            [0, 1, 0, 0, 0, 0, 1, 0],
+        ],
+        "galaxy": [
+            [1, 1, 1, 1, 1, 1, 0, 1, 1],
+            [1, 1, 1, 1, 1, 1, 0, 1, 1],
+            [0, 0, 0, 0, 0, 0, 0, 1, 1],
+            [1, 1, 0, 0, 0, 0, 0, 1, 1],
+            [1, 1, 0, 0, 0, 0, 0, 1, 1],
+            [1, 1, 0, 0, 0, 0, 0, 1, 1],
+            [1, 1, 0, 0, 0, 0, 0, 0, 0],
+            [1, 1, 0, 1, 1, 1, 1, 1, 1],
+            [1, 1, 0, 1, 1, 1, 1, 1, 1],
+        ],
+        "glider_gun": [
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1,],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1,],
+            [1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,],
+            [1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,],
+        ],
         "puffer_train": [
             [0, 0, 0, 1, 0,],
             [0, 0, 0, 0, 1,],
@@ -86,9 +114,9 @@ class Model {
     /**
      * 対象セルの次の状態はどうなるのか返す。
      * @param {Array} stage 
-     * @param {*} idx 
-     * @param {*} width 
-     * @param {*} height 
+     * @param {int} idx 
+     * @param {int} width 
+     * @param {int} height 
      * @return {int} DEAD or LIVE
      */
     static whatComesNext(stage, idx, width) {
@@ -154,9 +182,9 @@ class Model {
     /**
      * 2次元座標系を元に、ステージ上のインデックスを求める。
      * ステージ自体は1次元配列で実装されているため、このような変換処理が必要になる。
-     * @param {*} x 
-     * @param {*} y 
-     * @param {*} width 
+     * @param {int} x 
+     * @param {int} y 
+     * @param {int} width 
      */
     static getOneDimIdxFrom(x, y, width) {
         return y * width + x;
@@ -167,9 +195,18 @@ class Model {
         let formationHeight = formation.length;
         
         //プリセットの初期配置を、ステージの中央に配置する。
-        //配置のための開始座標を決定する。
-        
-        
+        //プリセットがステージの真ん中に来るようにしたときの、開始座標を割り出す。
+        let startX = Math.floor(width / 2) - Math.floor(formationWidth / 2);
+        let startY = Math.floor(height / 2) - Math.floor(formationHeight / 2);
+        //プリセット配置図の中にあるセルを、ステージの真ん中に位置するように配置する。
+        for (let y = 0; y < formation.length; y++) {
+            for (let x = 0; x < formation[y].length; x++) {
+                let targetIdx = Model.getOneDimIdxFrom(startX + x, startY + y, width);
+                stage[targetIdx] = formation[y][x];
+            }
+        }
+
+        return stage;
     }
 }
 
@@ -236,6 +273,10 @@ $(() => {
     //一番最初に初期化する。
     initialize();
 
+    /////////////////////
+    // イベントハンドラ
+    /////////////////////
+
     //まずはじめに、初期状態を決める。天地創造！！
     //セルをクリックすると、色がついたりつかなかったりする。それに合わせてstateの該当箇所も置き換える。
     $("#stage")
@@ -280,7 +321,7 @@ $(() => {
             if (Model.isDestroyed(state.nowStage)) {
                 $("button#stop").click();
             }
-        }, 500);
+        }, constant.tickMSec);
 
         $(e.target).addClass("control-panel__button--active");
     });
